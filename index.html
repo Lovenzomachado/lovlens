@@ -528,7 +528,9 @@ codeEl.addEventListener('keydown', e => {
 // ── BUILD + RUN ───────────────────────────────────────────────────────────────
 const BRIDGE = `<script>
 (function(){
-  var ov=null;
+  var ov=null, flexOv=null, flexBadge=null;
+
+  /* ── PATH ── */
   function getPath(el){
     var p=[],cur=el;
     while(cur&&cur.tagName&&cur!==document.body){
@@ -540,6 +542,8 @@ const BRIDGE = `<script>
     }
     return p.join(' > ');
   }
+
+  /* ── ELEMENT HIGHLIGHT BOX ── */
   function box(el){
     if(ov)ov.remove();
     var r=el.getBoundingClientRect();
@@ -547,33 +551,154 @@ const BRIDGE = `<script>
     Object.assign(ov.style,{
       position:'fixed',top:r.top+'px',left:r.left+'px',
       width:r.width+'px',height:r.height+'px',
-      border:'2px solid #80914b',background:'rgba(128,145,75,0.12)',
-      pointerEvents:'none',zIndex:'999999',borderRadius:'3px',boxSizing:'border-box'
+      border:'2px solid #80914b',background:'rgba(128,145,75,0.10)',
+      pointerEvents:'none',zIndex:'999998',borderRadius:'3px',boxSizing:'border-box'
     });
     document.body.appendChild(ov);
   }
-  function clear(){if(ov){ov.remove();ov=null;}}
+
+  /* ── FLEX OVERLAY ── */
+  function clearFlex(){
+    if(flexOv){flexOv.remove();flexOv=null;}
+    if(flexBadge){flexBadge.remove();flexBadge=null;}
+  }
+
+  function drawFlexOverlay(el){
+    clearFlex();
+    var cs=getComputedStyle(el);
+    var disp=cs.display;
+    if(disp!=='flex'&&disp!=='inline-flex') return;
+
+    var dir=cs.flexDirection;       // row | column | row-reverse | column-reverse
+    var wrap=cs.flexWrap;
+    var ai=cs.alignItems;
+    var jc=cs.justifyContent;
+    var gap=cs.gap||cs.rowGap||'0px';
+    var isRow=dir==='row'||dir==='row-reverse';
+    var r=el.getBoundingClientRect();
+
+    /* Container overlay */
+    flexOv=document.createElement('div');
+    Object.assign(flexOv.style,{
+      position:'fixed',top:r.top+'px',left:r.left+'px',
+      width:r.width+'px',height:r.height+'px',
+      border:'2px dashed #DEA821',
+      pointerEvents:'none',zIndex:'999999',boxSizing:'border-box',
+      borderRadius:'3px'
+    });
+    document.body.appendChild(flexOv);
+
+    /* Children overlays */
+    Array.from(el.children).forEach(function(child){
+      var cr=child.getBoundingClientRect();
+      if(cr.width===0&&cr.height===0) return;
+      var childOv=document.createElement('div');
+      Object.assign(childOv.style,{
+        position:'fixed',
+        top:cr.top+'px',left:cr.left+'px',
+        width:cr.width+'px',height:cr.height+'px',
+        background:'rgba(222,168,33,0.15)',
+        border:'1px solid rgba(222,168,33,0.6)',
+        pointerEvents:'none',zIndex:'999999',boxSizing:'border-box',
+        borderRadius:'2px'
+      });
+      flexOv.appendChild(childOv);
+    });
+
+    /* Direction arrow inside container */
+    var arrow=document.createElement('div');
+    var arrowChar=isRow ? '→' : '↓';
+    if(dir==='row-reverse') arrowChar='←';
+    if(dir==='column-reverse') arrowChar='↑';
+    Object.assign(arrow.style,{
+      position:'absolute',top:'50%',left:'50%',
+      transform:'translate(-50%,-50%)',
+      fontSize:'18px',color:'rgba(222,168,33,0.7)',
+      fontFamily:'monospace',fontWeight:'bold',
+      pointerEvents:'none',userSelect:'none',
+      lineHeight:'1'
+    });
+    arrow.textContent=arrowChar;
+    flexOv.appendChild(arrow);
+
+    /* Badge with flex props */
+    flexBadge=document.createElement('div');
+    Object.assign(flexBadge.style,{
+      position:'fixed',
+      top:Math.max(4,r.top-28)+'px',
+      left:r.left+'px',
+      background:'#1a1a1a',color:'#DEA821',
+      fontFamily:'monospace',fontSize:'11px',fontWeight:'600',
+      padding:'3px 8px',borderRadius:'3px',
+      pointerEvents:'none',zIndex:'9999999',
+      whiteSpace:'nowrap',
+      boxShadow:'0 2px 8px rgba(0,0,0,0.3)',
+      lineHeight:'1.5'
+    });
+    var parts=['flex'];
+    parts.push(dir!=='row'?dir:'row');
+    if(jc!=='normal'&&jc!=='flex-start') parts.push('jc:'+jc.replace('flex-',''));
+    if(ai!=='normal'&&ai!=='stretch') parts.push('ai:'+ai.replace('flex-',''));
+    if(gap&&gap!=='0px'&&gap!=='normal') parts.push('gap:'+gap);
+    if(wrap==='wrap') parts.push('wrap');
+    flexBadge.textContent=parts.join(' · ');
+    document.body.appendChild(flexBadge);
+  }
+
+  /* ── CLEAR ALL ── */
+  function clear(){
+    if(ov){ov.remove();ov=null;}
+    clearFlex();
+  }
+
+  /* ── SEND MESSAGE ── */
   function send(type,el){
+    var cs=el?getComputedStyle(el):null;
+    var flex=cs&&(cs.display==='flex'||cs.display==='inline-flex');
     window.parent.postMessage({
       type:'dl:'+type,
       tag:el?el.tagName.toLowerCase():null,
       id:el?(el.id||null):null,
       cls:el?Array.from(el.classList):[],
-      path:el?getPath(el):null
+      path:el?getPath(el):null,
+      isFlex:flex||false,
+      flexProps:flex?{
+        display:cs.display,
+        flexDirection:cs.flexDirection,
+        justifyContent:cs.justifyContent,
+        alignItems:cs.alignItems,
+        flexWrap:cs.flexWrap,
+        gap:cs.gap,
+        childCount:el.children.length
+      }:null
     },'*');
   }
+
   document.addEventListener('mouseover',function(e){
     if(!window.__dl)return;
-    e.stopPropagation();box(e.target);send('hover',e.target);
+    e.stopPropagation();
+    box(e.target);
+    var cs=getComputedStyle(e.target);
+    if(cs.display==='flex'||cs.display==='inline-flex') drawFlexOverlay(e.target);
+    else clearFlex();
+    send('hover',e.target);
   },true);
+
   document.addEventListener('click',function(e){
     if(!window.__dl)return;
     e.preventDefault();e.stopPropagation();
-    box(e.target);send('select',e.target);
+    box(e.target);
+    var cs=getComputedStyle(e.target);
+    if(cs.display==='flex'||cs.display==='inline-flex') drawFlexOverlay(e.target);
+    else clearFlex();
+    send('select',e.target);
   },true);
+
   document.addEventListener('mouseleave',function(){
-    if(!window.__dl)return;clear();send('leave',null);
+    if(!window.__dl)return;
+    clear();send('leave',null);
   });
+
   window.addEventListener('message',function(e){
     if(e.data&&e.data.type==='dl:set'){
       window.__dl=e.data.on;
