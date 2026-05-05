@@ -9,385 +9,177 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* ── Palette from designtoken.md ── */
-  --primary-base:    #ccd5ae;
-  --primary-300:     #C4CAAF;
-  --primary-500:     #93A45B;
-  --primary-600:     #80914B;
-  --primary-700:     #6C7B3D;
-  --primary-800:     #535D32;
-  --primary-900:     #3A4125;
+  --primary-300:  #C4CAAF;
+  --primary-500:  #93A45B;
+  --primary-600:  #80914B;
+  --primary-700:  #6C7B3D;
+  --primary-800:  #535D32;
+  --primary-900:  #3A4125;
+  --secondary-200:#DFE1D0;
+  --tertiary-500: #DEA821;
+  --tertiary-600: #C89514;
+  --neutral-50:   #F8F8F6;
+  --neutral-100:  #F1F0E9;
+  --neutral-200:  #E9E5C9;
 
-  --secondary-base:  #e9edc9;
-  --secondary-200:   #DFE1D0;
+  --bg:       var(--neutral-50);
+  --surface:  #ffffff;
+  --surface2: var(--neutral-100);
+  --border:   var(--neutral-200);
+  --border2:  var(--primary-300);
+  --text:     var(--primary-900);
+  --text2:    var(--primary-800);
+  --muted:    #9a9070;
+  --accent:   var(--primary-600);
+  --accent-bg:rgba(128,145,75,0.10);
+  --green:    #16A34A;
+  --green-bg: rgba(22,163,74,0.10);
 
-  --tertiary-base:   #faedcd;
-  --tertiary-400:    #DDB85A;
-  --tertiary-500:    #DEA821;
-  --tertiary-600:    #C89514;
-
-  --neutral-base:    #fefae0;
-  --neutral-50:      #F8F8F6;
-  --neutral-100:     #F1F0E9;
-  --neutral-200:     #E9E5C9;
-  --neutral-300:     #E5DA94;
-  --neutral-900:     #5C510A;
-
-  /* ── Semantic roles ── */
-  --bg:           var(--neutral-50);
-  --surface:      #ffffff;
-  --surface2:     var(--neutral-100);
-  --surface3:     var(--secondary-200);
-  --border:       var(--neutral-200);
-  --border2:      var(--primary-300);
-  --text:         var(--primary-900);
-  --text2:        var(--primary-800);
-  --text3:        var(--primary-700);
-  --muted:        #9a9070;
-
-  /* ── Accents ── */
-  --accent:       var(--primary-600);
-  --accent2:      var(--primary-500);
-  --accent-bg:    rgba(128,145,75,0.10);
-
-  /* ── Syntax colours (light) ── */
-  --syn-tag:      #80914b;
-  --syn-attr:     #c89514;
-  --syn-val:      #535d32;
-  --syn-comment:  #a8b080;
-  --syn-keyword:  #6c7b3d;
-  --syn-string:   #7f6010;
-
-  /* ── Status ── */
-  --green:        #16A34A;
-  --green-bg:     rgba(22,163,74,0.10);
-  --orange:       var(--tertiary-500);
-  --blue:         #2563EB;
-  --yellow:       var(--tertiary-600);
-  --pink:         #be185d;
-
-  /* ── Spacing from token ── */
-  --sp-xs:  5px;
-  --sp-sm:  10px;
-  --sp-md:  20px;
-  --sp-lg:  30px;
-
-  /* ── Radius from token ── */
-  --r-sm: 1px;
-  --r-md: 2px;
-  --r-lg: 3px;
-  --r-xl: 4px;
-  --r-full: 9999px;
-
-  /* ── Shadows ── */
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
-
   --mono: 'JetBrains Mono', monospace;
   --sans: 'Plus Jakarta Sans', sans-serif;
 }
 
 html, body { height: 100%; overflow: hidden; }
-body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-}
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
 
-/* ── HEADER ── */
+/* HEADER */
 header {
-  height: 50px;
-  flex-shrink: 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  gap: var(--sp-sm);
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
+  height: 50px; flex-shrink: 0;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 10px;
+  box-shadow: var(--shadow-sm); z-index: 10;
 }
-
-.logo {
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--primary-600);
-}
+.logo { font-size: 17px; font-weight: 800; letter-spacing: -0.03em; color: var(--primary-600); }
 .logo span { color: var(--tertiary-500); }
-
-.sep {
-  width: 1px;
-  height: 18px;
-  background: var(--border2);
-}
-
+.sep { width: 1px; height: 18px; background: var(--border2); }
 .badge {
-  font-size: 11px;
-  font-weight: 600;
-  font-family: var(--mono);
-  color: var(--primary-700);
-  background: var(--accent-bg);
-  padding: 2px 8px;
-  border-radius: var(--r-full);
-  border: 1px solid var(--primary-300);
-  /* overline style */
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 11px; font-weight: 600; font-family: var(--mono);
+  color: var(--primary-700); background: var(--accent-bg);
+  padding: 2px 8px; border-radius: 9999px; border: 1px solid var(--primary-300);
+  letter-spacing: 0.06em; text-transform: uppercase;
 }
-
 .header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
-
-.hint {
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--muted);
-  letter-spacing: 0.02em;
-}
-
+.hint { font-size: 11px; font-family: var(--mono); color: var(--muted); }
 .btn {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--border2);
-  background: var(--surface2);
-  color: var(--text2);
-  cursor: pointer;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+  padding: 6px 14px; border-radius: 2px; border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text2); cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; gap: 6px;
 }
-.btn:hover {
-  background: var(--secondary-base);
-  color: var(--text);
-  border-color: var(--accent);
-}
-.btn-run {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-.btn-run:hover {
-  background: var(--primary-700);
-  border-color: var(--primary-700);
-  color: #fff;
-}
-.btn-inspect.on {
-  background: var(--green-bg);
-  border-color: rgba(22,163,74,.4);
-  color: var(--green);
-}
+.btn:hover { background: #e9edc9; color: var(--text); border-color: var(--accent); }
+.btn-run { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-run:hover { background: var(--primary-700); border-color: var(--primary-700); color: #fff; }
+.btn-inspect.on { background: var(--green-bg); border-color: rgba(22,163,74,.4); color: var(--green); }
 
-/* ── WORKSPACE ── */
-.workspace { display: flex; flex: 1; overflow: hidden; }
+/* WORKSPACE */
+.workspace { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
-/* ── EDITOR PANEL ── */
-.editor-panel {
-  width: 48%;
-  min-width: 280px;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border);
-  flex-shrink: 0;
-}
+/* EDITOR PANEL */
+.editor-panel { width: 48%; min-width: 280px; display: flex; flex-direction: column; border-right: 1px solid var(--border); flex-shrink: 0; min-height: 0; }
 
-.tabs {
-  display: flex;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 0 8px;
-  flex-shrink: 0;
-}
-
+.tabs { display: flex; background: var(--surface2); border-bottom: 1px solid var(--border); padding: 0 8px; flex-shrink: 0; }
 .tab {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 9px 14px;
-  cursor: pointer;
-  color: var(--muted);
-  border-bottom: 2px solid transparent;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-  top: 1px;
-  letter-spacing: 0.02em;
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  padding: 9px 14px; cursor: pointer; color: var(--muted);
+  border-bottom: 2px solid transparent; transition: all .15s;
+  display: flex; align-items: center; gap: 6px; position: relative; top: 1px;
 }
 .tab:hover { color: var(--text2); }
 .tab.active { color: var(--text); }
-.tab[data-lang=html].active { border-color: var(--orange);     color: var(--orange); }
-.tab[data-lang=css].active  { border-color: var(--primary-600); color: var(--primary-600); }
-.tab[data-lang=js].active   { border-color: var(--yellow);     color: var(--yellow); }
-
+.tab[data-lang=html].active { border-color: var(--tertiary-500); color: var(--tertiary-500); }
+.tab[data-lang=css].active  { border-color: var(--primary-600);  color: var(--primary-600); }
+.tab[data-lang=js].active   { border-color: var(--tertiary-600); color: var(--tertiary-600); }
 .dot { width: 7px; height: 7px; border-radius: 50%; }
-.tab[data-lang=html] .dot { background: var(--orange); }
+.tab[data-lang=html] .dot { background: var(--tertiary-500); }
 .tab[data-lang=css]  .dot { background: var(--primary-600); }
-.tab[data-lang=js]   .dot { background: var(--yellow); }
+.tab[data-lang=js]   .dot { background: var(--tertiary-600); }
 
-/* ── CODE AREA ── */
-.code-area {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  background: var(--surface);
+/* CODE AREA — the only scroll is on #code itself */
+.code-area { flex: 1; display: flex; overflow: hidden; min-height: 0; background: var(--surface); }
+
+/* Line numbers: fixed column, no scroll of its own — synced via JS */
+#line-nums {
+  font-family: var(--mono); font-size: 13px; line-height: 22px;
+  color: var(--border2); padding: 14px 8px 14px 12px;
+  width: 48px; min-width: 48px;
+  text-align: right; overflow: hidden; user-select: none; flex-shrink: 0;
+  border-right: 1px solid var(--border); background: var(--neutral-50);
 }
+#line-nums .ln { height: 22px; display: block; }
+#line-nums .ln.hl { color: var(--accent); font-weight: 700; background: rgba(128,145,75,0.13); border-left: 3px solid #80914b; margin-left: -12px; padding-left: 9px; }
 
-.line-nums {
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 22px;
-  color: var(--border2);
-  padding: 14px 8px 14px 12px;
-  min-width: 44px;
-  text-align: right;
-  overflow: hidden;
-  user-select: none;
-  flex-shrink: 0;
-  border-right: 1px solid var(--border);
-  background: var(--neutral-50);
-}
-.line-nums .hl { color: var(--accent); font-weight: 600; }
-
-.editor-scroll { flex: 1; overflow: auto; position: relative; }
-
-#hl-layer {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
+/* The textarea IS the scroll container */
 #code {
-  position: relative; z-index: 1;
-  display: block;
-  width: 100%; min-height: 100%;
+  flex: 1;
+  font-family: var(--mono); font-size: 13px; line-height: 22px;
   padding: 14px 16px;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 22px;
-  background: transparent;
-  color: var(--text);
   border: none; outline: none; resize: none;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow: visible;
-  caret-color: var(--accent);
-  tab-size: 2;
+  background: var(--surface); color: var(--text);
+  white-space: pre; overflow: auto;
+  caret-color: var(--accent); tab-size: 2;
+  /* Highlight lines via JS-set background gradient */
 }
 
-/* ── DIVIDER ── */
-.divider {
-  width: 5px;
-  background: var(--neutral-100);
-  cursor: col-resize;
-  flex-shrink: 0;
-  transition: background .15s;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-}
+/* DIVIDER */
+.divider { width: 5px; background: var(--neutral-100); cursor: col-resize; flex-shrink: 0; transition: background .15s; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
 .divider:hover, .divider.drag { background: var(--accent-bg); border-color: var(--accent); }
 
-/* ── PREVIEW ── */
-.preview-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-}
-
+/* PREVIEW */
+.preview-panel { flex: 1; display: flex; flex-direction: column; min-width: 200px; min-height: 0; }
 .preview-bar {
-  height: 40px;
-  flex-shrink: 0;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  gap: 8px;
+  height: 40px; flex-shrink: 0;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 12px; gap: 8px;
 }
-
 .mac-dots { display: flex; gap: 5px; }
 .mac-dot { width: 10px; height: 10px; border-radius: 50%; }
 .mac-dot:nth-child(1) { background: #ff5f57; }
 .mac-dot:nth-child(2) { background: #febc2e; }
 .mac-dot:nth-child(3) { background: #28c840; }
-.preview-url {
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--muted);
-  margin-left: auto;
-  letter-spacing: 0.04em;
-}
-
-.frame-wrap { flex: 1; overflow: hidden; }
+.preview-url { font-size: 11px; font-family: var(--mono); color: var(--muted); margin-left: auto; }
+.frame-wrap { flex: 1; overflow: hidden; min-height: 0; }
 #frame { width: 100%; height: 100%; border: none; background: #fff; display: block; }
 
-/* ── STATUS BAR ── */
+/* STATUS BAR */
 .status-bar {
-  height: 26px;
-  flex-shrink: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  gap: 16px;
+  height: 26px; flex-shrink: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 14px; gap: 16px;
 }
-.s-item {
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  letter-spacing: 0.02em;
-}
+.s-item { font-size: 11px; font-family: var(--mono); color: var(--muted); display: flex; align-items: center; gap: 5px; }
 .s-item b { color: var(--accent); font-weight: 500; }
-
-/* ── STATUS INDICATOR DOT ── */
-.status-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--primary-300);
-  flex-shrink: 0;
-  transition: background .2s;
-}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary-300); flex-shrink: 0; transition: background .2s; }
 .status-dot.active { background: var(--green); box-shadow: 0 0 0 2px var(--green-bg); }
 
-/* ── TOOLTIP ── */
+/* TOOLTIP */
 #tt {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: var(--r-lg);
-  padding: 6px 10px;
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--text2);
-  display: none;
-  max-width: 300px;
-  line-height: 1.5;
+  position: fixed; pointer-events: none; z-index: 9999;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 3px; padding: 6px 10px;
+  font-size: 11px; font-family: var(--mono); color: var(--text2);
+  display: none; max-width: 300px; line-height: 1.5;
   box-shadow: var(--shadow-md);
 }
-#tt .t { color: var(--syn-tag); }
+#tt .t { color: #80914b; }
 #tt .i { color: var(--tertiary-600); }
 #tt .c { color: var(--green); }
 #tt .p { font-size: 10px; opacity: .55; display: block; margin-top: 2px; color: var(--muted); }
 
-/* ── SCROLLBARS ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: var(--r-full); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* MOBILE */
+@media (max-width: 640px) {
+  .workspace { flex-direction: column; }
+  .editor-panel { width: 100% !important; min-width: 0; height: 50vh; border-right: none; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .divider { display: none; }
+  .preview-panel { width: 100%; flex: 1; min-height: 0; }
+  .hint { display: none; }
+}
 </style>
 </head>
 <body>
@@ -401,10 +193,8 @@ header {
     <button class="btn btn-inspect" id="btn-inspect">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
         <circle cx="8" cy="8" r="3"/>
-        <line x1="8" y1="1" x2="8" y2="3"/>
-        <line x1="8" y1="13" x2="8" y2="15"/>
-        <line x1="1" y1="8" x2="3" y2="8"/>
-        <line x1="13" y1="8" x2="15" y2="8"/>
+        <line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/>
+        <line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/>
       </svg>
       Inspetor
     </button>
@@ -423,11 +213,8 @@ header {
       <div class="tab" data-lang="js"><span class="dot"></span>JS</div>
     </div>
     <div class="code-area">
-      <div class="line-nums" id="line-nums"></div>
-      <div class="editor-scroll" id="editor-scroll">
-        <div id="hl-layer"></div>
-        <textarea id="code" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
-      </div>
+      <div id="line-nums"></div>
+      <textarea id="code" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
     </div>
   </div>
 
@@ -435,11 +222,7 @@ header {
 
   <div class="preview-panel">
     <div class="preview-bar">
-      <div class="mac-dots">
-        <div class="mac-dot"></div>
-        <div class="mac-dot"></div>
-        <div class="mac-dot"></div>
-      </div>
+      <div class="mac-dots"><div class="mac-dot"></div><div class="mac-dot"></div><div class="mac-dot"></div></div>
       <div class="preview-url">preview</div>
     </div>
     <div class="frame-wrap">
@@ -460,7 +243,6 @@ header {
 <div id="tt"></div>
 
 <script>
-// ── SAMPLES ───────────────────────────────────────────────────────────────────
 const SAMPLES = {
 html: `<div class="card">
   <div class="card-header">
@@ -616,7 +398,6 @@ card.addEventListener('mouseleave', () => {
 });`
 };
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
 const S = {
   lang: 'html',
   codes: { html: SAMPLES.html, css: SAMPLES.css, js: SAMPLES.js },
@@ -625,12 +406,9 @@ const S = {
   lastSel: null
 };
 
-// ── REFS ──────────────────────────────────────────────────────────────────────
 const editorPanel    = document.getElementById('editor-panel');
 const codeEl         = document.getElementById('code');
 const lineNumsEl     = document.getElementById('line-nums');
-const editorScroll   = document.getElementById('editor-scroll');
-const hlLayer        = document.getElementById('hl-layer');
 const frame          = document.getElementById('frame');
 const btnRun         = document.getElementById('btn-run');
 const btnInspect     = document.getElementById('btn-inspect');
@@ -646,30 +424,59 @@ const LINE_H  = 22;
 const PAD_TOP = 14;
 
 // ── LINE NUMBERS ──────────────────────────────────────────────────────────────
+// Rendered as <span> blocks inside a single container that is scrolled via JS
 function renderLineNums() {
-  const lines = codeEl.value.split('\n');
-  lineNumsEl.innerHTML = lines.map((_, i) => {
+  const count = codeEl.value.split('\n').length;
+  lineNumsEl.innerHTML = Array.from({ length: count }, (_, i) => {
     const n = i + 1;
-    return `<div class="${S.hlLines.includes(n) ? 'hl' : ''}">${n}</div>`;
+    return `<span class="ln${S.hlLines.includes(n) ? ' hl' : ''}">${n}</span>`;
   }).join('');
-  lineNumsEl.scrollTop = editorScroll.scrollTop;
 }
 
-// ── HIGHLIGHT BACKGROUND LAYER ────────────────────────────────────────────────
-function renderHlLayer() {
-  if (!S.hlLines.length) { hlLayer.innerHTML = ''; return; }
+// Sync line-nums scroll position to match textarea scroll
+function syncLineNums() {
+  lineNumsEl.scrollTop = codeEl.scrollTop;
+}
+
+// ── HIGHLIGHT ────────────────────────────────────────────────────────────────
+// We paint highlight bands as a CSS linear-gradient on the textarea background
+function applyHighlightBg() {
+  if (!S.hlLines.length) {
+    codeEl.style.background = '#ffffff';
+    return;
+  }
   const totalLines = codeEl.value.split('\n').length;
-  const totalH = PAD_TOP + totalLines * LINE_H + PAD_TOP;
-  hlLayer.style.height = totalH + 'px';
-  hlLayer.innerHTML = S.hlLines.map(n =>
-    `<div style="position:absolute;left:0;right:0;top:${PAD_TOP+(n-1)*LINE_H}px;height:${LINE_H}px;background:rgba(128,145,75,0.10);border-left:3px solid #80914b;"></div>`
-  ).join('');
+  const totalH = PAD_TOP + totalLines * LINE_H; // approximate total height
+
+  // Build gradient stops: white everywhere, accent color on hl lines
+  const stops = [];
+  const HL_COLOR = 'rgba(128,145,75,0.10)';
+  const WHITE    = '#ffffff';
+
+  // We need to express positions as percentages of the scrollHeight.
+  // Since scrollHeight changes dynamically, use px-based approach via
+  // repeating-linear-gradient trick: one band per highlighted line.
+  // Simpler: use a multi-stop linear-gradient based on line positions in px.
+  const pxStops = [];
+  for (let i = 1; i <= totalLines; i++) {
+    const top    = PAD_TOP + (i - 1) * LINE_H;
+    const bottom = top + LINE_H;
+    if (S.hlLines.includes(i)) {
+      pxStops.push(`${WHITE} ${top}px`, `${HL_COLOR} ${top}px`, `${HL_COLOR} ${bottom}px`, `${WHITE} ${bottom}px`);
+    }
+  }
+
+  if (pxStops.length === 0) {
+    codeEl.style.background = WHITE;
+  } else {
+    codeEl.style.background = `linear-gradient(to bottom, ${WHITE}, ${pxStops.join(', ')}, ${WHITE} ${totalH + PAD_TOP}px)`;
+  }
 }
 
 function setHighlight(lines) {
   S.hlLines = lines || [];
   renderLineNums();
-  renderHlLayer();
+  applyHighlightBg();
   if (lines.length) {
     scrollToLine(lines[0]);
     statusLineWrap.style.display = 'flex';
@@ -681,12 +488,11 @@ function setHighlight(lines) {
 
 function scrollToLine(n) {
   const target = PAD_TOP + (n - 3) * LINE_H;
-  editorScroll.scrollTop = Math.max(0, target);
+  codeEl.scrollTop = Math.max(0, target);
+  syncLineNums();
 }
 
-editorScroll.addEventListener('scroll', () => {
-  lineNumsEl.scrollTop = editorScroll.scrollTop;
-});
+codeEl.addEventListener('scroll', syncLineNums);
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
@@ -753,9 +559,7 @@ const BRIDGE = `<script>
       tag:el?el.tagName.toLowerCase():null,
       id:el?(el.id||null):null,
       cls:el?Array.from(el.classList):[],
-      path:el?getPath(el):null,
-      outerHTML:el?el.outerHTML.slice(0,600):null,
-      textContent:el?el.textContent.trim().slice(0,120):null
+      path:el?getPath(el):null
     },'*');
   }
   document.addEventListener('mouseover',function(e){
@@ -782,11 +586,7 @@ const BRIDGE = `<script>
 
 function buildDoc() {
   const { html, css, js } = S.codes;
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
-<style>${css}</style>${BRIDGE}</head>
-<body>${html}
-<script>try{${js}}catch(e){console.error(e)}<\/script>
-</body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${css}</style>${BRIDGE}</head><body>${html}<script>try{${js}}catch(e){console.error(e)}<\/script></body></html>`;
 }
 
 function run() {
@@ -821,7 +621,6 @@ btnInspect.addEventListener('click', () => {
 window.addEventListener('message', e => {
   const d = e.data;
   if (!d || typeof d.type !== 'string' || !d.type.startsWith('dl:')) return;
-
   if (d.type === 'dl:hover' && d.tag) {
     let h = `<span class="t">&lt;${d.tag}</span>`;
     if (d.id) h += ` <span class="i">#${d.id}</span>`;
@@ -863,23 +662,18 @@ function applyInspect(d) {
 }
 
 function findHTML(code, tag, id, cls) {
-  const lines = code.split('\n');
-  const found = [];
+  const lines = code.split('\n'); const found = [];
   function addBlock(i) {
     found.push(i + 1);
     if (!lines[i].includes('>')) {
       for (let j = i+1; j < Math.min(i+6, lines.length); j++) {
-        found.push(j+1);
-        if (lines[j].includes('>')) break;
+        found.push(j+1); if (lines[j].includes('>')) break;
       }
     }
   }
   if (id) {
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].toLowerCase().includes('<'+tag) &&
-         (lines[i].includes(`id="${id}"`) || lines[i].includes(`id='${id}'`)))
-        addBlock(i);
-    }
+    for (let i = 0; i < lines.length; i++)
+      if (lines[i].toLowerCase().includes('<'+tag) && (lines[i].includes(`id="${id}"`) || lines[i].includes(`id='${id}'`))) addBlock(i);
   }
   if (!found.length && cls?.length) {
     for (let i = 0; i < lines.length; i++) {
@@ -890,18 +684,14 @@ function findHTML(code, tag, id, cls) {
   if (!found.length) {
     for (let i = 0; i < lines.length; i++) {
       const t = lines[i].toLowerCase().trimStart();
-      if (t.startsWith('<'+tag+' ') || t.startsWith('<'+tag+'>') || t.startsWith('<'+tag+'\n')) {
-        addBlock(i); break;
-      }
+      if (t.startsWith('<'+tag+' ') || t.startsWith('<'+tag+'>') || t.startsWith('<'+tag+'\n')) { addBlock(i); break; }
     }
   }
   return [...new Set(found)].sort((a,b)=>a-b).slice(0,30);
 }
 
 function findCSS(code, tag, id, cls) {
-  const lines = code.split('\n');
-  const found = [];
-  const terms = [];
+  const lines = code.split('\n'); const found = []; const terms = [];
   if (id) terms.push('#'+id);
   if (cls?.length) cls.forEach(c => c && terms.push('.'+c));
   terms.push(tag);
@@ -923,23 +713,14 @@ function findCSS(code, tag, id, cls) {
 }
 
 function findJS(code, tag, id, cls) {
-  const lines = code.split('\n');
-  const found = [];
-  const terms = [];
-  if (id) {
-    terms.push(`#${id}`, `getElementById('${id}')`, `getElementById("${id}")`);
-  }
-  if (cls?.length) {
-    cls.forEach(c => {
-      if (!c) return;
-      terms.push(`.${c}`, `'${c}'`, `"${c}"`);
-    });
-  }
+  const lines = code.split('\n'); const found = []; const terms = [];
+  if (id) terms.push(`#${id}`, `getElementById('${id}')`, `getElementById("${id}")`);
+  if (cls?.length) cls.forEach(c => { if (!c) return; terms.push(`.${c}`, `'${c}'`, `"${c}"`); });
   terms.push(`'${tag}'`, `"${tag}"`, `<${tag}`, `${tag}(`);
   for (let i = 0; i < lines.length; i++) {
     if (!terms.some(t => lines[i].includes(t))) continue;
     found.push(i + 1);
-    const opens  = (lines[i].match(/\{/g)||[]).length;
+    const opens = (lines[i].match(/\{/g)||[]).length;
     const closes = (lines[i].match(/\}/g)||[]).length;
     if (opens > closes) {
       let depth = opens - closes;
@@ -956,8 +737,7 @@ function findJS(code, tag, id, cls) {
 // ── DIVIDER DRAG ──────────────────────────────────────────────────────────────
 let dragging = false;
 divider.addEventListener('mousedown', () => {
-  dragging = true;
-  divider.classList.add('drag');
+  dragging = true; divider.classList.add('drag');
   document.body.style.cursor = 'col-resize';
   document.body.style.userSelect = 'none';
   frame.style.pointerEvents = 'none';
@@ -970,8 +750,7 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mouseup', () => {
   if (!dragging) return;
-  dragging = false;
-  divider.classList.remove('drag');
+  dragging = false; divider.classList.remove('drag');
   document.body.style.cursor = '';
   document.body.style.userSelect = '';
   frame.style.pointerEvents = '';
