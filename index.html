@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lovlens — Editor com Inspetor Visual</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── Palette from designtoken.md ── */
+  --primary-base:    #ccd5ae;
+  --primary-300:     #C4CAAF;
+  --primary-500:     #93A45B;
+  --primary-600:     #80914B;
+  --primary-700:     #6C7B3D;
+  --primary-800:     #535D32;
+  --primary-900:     #3A4125;
+
+  --secondary-base:  #e9edc9;
+  --secondary-200:   #DFE1D0;
+
+  --tertiary-base:   #faedcd;
+  --tertiary-400:    #DDB85A;
+  --tertiary-500:    #DEA821;
+  --tertiary-600:    #C89514;
+
+  --neutral-base:    #fefae0;
+  --neutral-50:      #F8F8F6;
+  --neutral-100:     #F1F0E9;
+  --neutral-200:     #E9E5C9;
+  --neutral-300:     #E5DA94;
+  --neutral-900:     #5C510A;
+
+  /* ── Semantic roles ── */
+  --bg:           var(--neutral-50);
+  --surface:      #ffffff;
+  --surface2:     var(--neutral-100);
+  --surface3:     var(--secondary-200);
+  --border:       var(--neutral-200);
+  --border2:      var(--primary-300);
+  --text:         var(--primary-900);
+  --text2:        var(--primary-800);
+  --text3:        var(--primary-700);
+  --muted:        #9a9070;
+
+  /* ── Accents ── */
+  --accent:       var(--primary-600);
+  --accent2:      var(--primary-500);
+  --accent-bg:    rgba(128,145,75,0.10);
+
+  /* ── Syntax colours (light) ── */
+  --syn-tag:      #80914b;
+  --syn-attr:     #c89514;
+  --syn-val:      #535d32;
+  --syn-comment:  #a8b080;
+  --syn-keyword:  #6c7b3d;
+  --syn-string:   #7f6010;
+
+  /* ── Status ── */
+  --green:        #16A34A;
+  --green-bg:     rgba(22,163,74,0.10);
+  --orange:       var(--tertiary-500);
+  --blue:         #2563EB;
+  --yellow:       var(--tertiary-600);
+  --pink:         #be185d;
+
+  /* ── Spacing from token ── */
+  --sp-xs:  5px;
+  --sp-sm:  10px;
+  --sp-md:  20px;
+  --sp-lg:  30px;
+
+  /* ── Radius from token ── */
+  --r-sm: 1px;
+  --r-md: 2px;
+  --r-lg: 3px;
+  --r-xl: 4px;
+  --r-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  height: 50px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: var(--sp-sm);
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+}
+
+.logo {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--primary-600);
+}
+.logo span { color: var(--tertiary-500); }
+
+.sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border2);
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+  color: var(--primary-700);
+  background: var(--accent-bg);
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--primary-300);
+  /* overline style */
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.hint {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover {
+  background: var(--secondary-base);
+  color: var(--text);
+  border-color: var(--accent);
+}
+.btn-run {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-run:hover {
+  background: var(--primary-700);
+  border-color: var(--primary-700);
+  color: #fff;
+}
+.btn-inspect.on {
+  background: var(--green-bg);
+  border-color: rgba(22,163,74,.4);
+  color: var(--green);
+}
+
+/* ── WORKSPACE ── */
+.workspace { display: flex; flex: 1; overflow: hidden; }
+
+/* ── EDITOR PANEL ── */
+.editor-panel {
+  width: 48%;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tabs {
+  display: flex;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.tab {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 9px 14px;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  top: 1px;
+  letter-spacing: 0.02em;
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--text); }
+.tab[data-lang=html].active { border-color: var(--orange);     color: var(--orange); }
+.tab[data-lang=css].active  { border-color: var(--primary-600); color: var(--primary-600); }
+.tab[data-lang=js].active   { border-color: var(--yellow);     color: var(--yellow); }
+
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.tab[data-lang=html] .dot { background: var(--orange); }
+.tab[data-lang=css]  .dot { background: var(--primary-600); }
+.tab[data-lang=js]   .dot { background: var(--yellow); }
+
+/* ── CODE AREA ── */
+.code-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.line-nums {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--border2);
+  padding: 14px 8px 14px 12px;
+  min-width: 44px;
+  text-align: right;
+  overflow: hidden;
+  user-select: none;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--neutral-50);
+}
+.line-nums .hl { color: var(--accent); font-weight: 600; }
+
+.editor-scroll { flex: 1; overflow: auto; position: relative; }
+
+#hl-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#code {
+  position: relative; z-index: 1;
+  display: block;
+  width: 100%; min-height: 100%;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 22px;
+  background: transparent;
+  color: var(--text);
+  border: none; outline: none; resize: none;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow: visible;
+  caret-color: var(--accent);
+  tab-size: 2;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  width: 5px;
+  background: var(--neutral-100);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background .15s;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.divider:hover, .divider.drag { background: var(--accent-bg); border-color: var(--accent); }
+
+/* ── PREVIEW ── */
+.preview-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.preview-bar {
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.mac-dots { display: flex; gap: 5px; }
+.mac-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mac-dot:nth-child(1) { background: #ff5f57; }
+.mac-dot:nth-child(2) { background: #febc2e; }
+.mac-dot:nth-child(3) { background: #28c840; }
+.preview-url {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  margin-left: auto;
+  letter-spacing: 0.04em;
+}
+
+.frame-wrap { flex: 1; overflow: hidden; }
+#frame { width: 100%; height: 100%; border: none; background: #fff; display: block; }
+
+/* ── STATUS BAR ── */
+.status-bar {
+  height: 26px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 16px;
+}
+.s-item {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.02em;
+}
+.s-item b { color: var(--accent); font-weight: 500; }
+
+/* ── STATUS INDICATOR DOT ── */
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--primary-300);
+  flex-shrink: 0;
+  transition: background .2s;
+}
+.status-dot.active { background: var(--green); box-shadow: 0 0 0 2px var(--green-bg); }
+
+/* ── TOOLTIP ── */
+#tt {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  padding: 6px 10px;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text2);
+  display: none;
+  max-width: 300px;
+  line-height: 1.5;
+  box-shadow: var(--shadow-md);
+}
+#tt .t { color: var(--syn-tag); }
+#tt .i { color: var(--tertiary-600); }
+#tt .c { color: var(--green); }
+#tt .p { font-size: 10px; opacity: .55; display: block; margin-top: 2px; color: var(--muted); }
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: var(--r-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">lov<span>lens</span></div>
+  <div class="sep"></div>
+  <div class="badge">editor + inspetor</div>
+  <div class="header-right">
+    <span class="hint">Ctrl+Enter = run</span>
+    <button class="btn btn-inspect" id="btn-inspect">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="8" cy="8" r="3"/>
+        <line x1="8" y1="1" x2="8" y2="3"/>
+        <line x1="8" y1="13" x2="8" y2="15"/>
+        <line x1="1" y1="8" x2="3" y2="8"/>
+        <line x1="13" y1="8" x2="15" y2="8"/>
+      </svg>
+      Inspetor
+    </button>
+    <button class="btn btn-run" id="btn-run">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,1 11,6 2,11"/></svg>
+      Executar
+    </button>
+  </div>
+</header>
+
+<div class="workspace" id="workspace">
+  <div class="editor-panel" id="editor-panel">
+    <div class="tabs">
+      <div class="tab active" data-lang="html"><span class="dot"></span>HTML</div>
+      <div class="tab" data-lang="css"><span class="dot"></span>CSS</div>
+      <div class="tab" data-lang="js"><span class="dot"></span>JS</div>
+    </div>
+    <div class="code-area">
+      <div class="line-nums" id="line-nums"></div>
+      <div class="editor-scroll" id="editor-scroll">
+        <div id="hl-layer"></div>
+        <textarea id="code" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider" id="divider"></div>
+
+  <div class="preview-panel">
+    <div class="preview-bar">
+      <div class="mac-dots">
+        <div class="mac-dot"></div>
+        <div class="mac-dot"></div>
+        <div class="mac-dot"></div>
+      </div>
+      <div class="preview-url">preview</div>
+    </div>
+    <div class="frame-wrap">
+      <iframe id="frame" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+    <div class="status-bar">
+      <div class="s-item">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-info">Ative o inspetor e clique em um elemento</span>
+      </div>
+      <div class="s-item" id="status-line-wrap" style="margin-left:auto;display:none">
+        linha <b id="status-line">—</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tt"></div>
+
+<script>
+// ── SAMPLES ───────────────────────────────────────────────────────────────────
+const SAMPLES = {
+html: `<div class="card">
+  <div class="card-header">
+    <div class="avatar">JD</div>
+    <div class="info">
+      <h2 class="name">Jane Doe</h2>
+      <p class="role">Product Designer</p>
+    </div>
+  </div>
+  <p class="bio">
+    Criando experiências digitais memoráveis com foco em usabilidade e beleza visual.
+  </p>
+  <div class="tags">
+    <span class="tag">UI/UX</span>
+    <span class="tag">Figma</span>
+    <span class="tag">CSS</span>
+    <span class="tag">Motion</span>
+  </div>
+  <div class="actions">
+    <button class="btn-primary">Seguir</button>
+    <button class="btn-secondary">Mensagem</button>
+  </div>
+</div>`,
+
+css: `* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  width: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c63ff, #a78bfa);
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.role {
+  font-size: 13px;
+  color: #6c63ff;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.bio {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: #f0eeff;
+  color: #6c63ff;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  flex: 1; padding: 10px; border: none;
+  border-radius: 10px; background: #6c63ff;
+  color: white; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .2s;
+}
+.btn-primary:hover { background: #5a52e0; }
+
+.btn-secondary {
+  flex: 1; padding: 10px;
+  border: 2px solid #6c63ff; border-radius: 10px;
+  background: transparent; color: #6c63ff;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}`,
+
+js: `// Interatividade do card
+const btnPrimary = document.querySelector('.btn-primary');
+const btnSecondary = document.querySelector('.btn-secondary');
+const avatar = document.querySelector('.avatar');
+const card = document.querySelector('.card');
+
+let following = false;
+
+btnPrimary.addEventListener('click', () => {
+  following = !following;
+  btnPrimary.textContent = following ? 'Seguindo ✓' : 'Seguir';
+  btnPrimary.style.background = following ? '#10b981' : '#6c63ff';
+});
+
+btnSecondary.addEventListener('click', () => {
+  alert('Mensagem enviada para Jane Doe!');
+});
+
+avatar.style.cursor = 'pointer';
+avatar.addEventListener('click', () => {
+  avatar.style.transform = 'scale(1.15)';
+  avatar.style.transition = 'transform 0.15s';
+  setTimeout(() => { avatar.style.transform = ''; }, 200);
+});
+
+card.addEventListener('mouseenter', () => {
+  card.style.transform = 'translateY(-2px)';
+  card.style.transition = 'transform 0.2s';
+  card.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)';
+});
+card.addEventListener('mouseleave', () => {
+  card.style.transform = '';
+  card.style.boxShadow = '';
+});`
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const S = {
+  lang: 'html',
+  codes: { html: SAMPLES.html, css: SAMPLES.css, js: SAMPLES.js },
+  inspect: false,
+  hlLines: [],
+  lastSel: null
+};
+
+// ── REFS ──────────────────────────────────────────────────────────────────────
+const editorPanel    = document.getElementById('editor-panel');
+const codeEl         = document.getElementById('code');
+const lineNumsEl     = document.getElementById('line-nums');
+const editorScroll   = document.getElementById('editor-scroll');
+const hlLayer        = document.getElementById('hl-layer');
+const frame          = document.getElementById('frame');
+const btnRun         = document.getElementById('btn-run');
+const btnInspect     = document.getElementById('btn-inspect');
+const statusInfo     = document.getElementById('status-info');
+const statusDot      = document.getElementById('status-dot');
+const statusLineWrap = document.getElementById('status-line-wrap');
+const statusLineEl   = document.getElementById('status-line');
+const tt             = document.getElementById('tt');
+const divider        = document.getElementById('divider');
+const workspace      = document.getElementById('workspace');
+
+const LINE_H  = 22;
+const PAD_TOP = 14;
+
+// ── LINE NUMBERS ──────────────────────────────────────────────────────────────
+function renderLineNums() {
+  const lines = codeEl.value.split('\n');
+  lineNumsEl.innerHTML = lines.map((_, i) => {
+    const n = i + 1;
+    return `<div class="${S.hlLines.includes(n) ? 'hl' : ''}">${n}</div>`;
+  }).join('');
+  lineNumsEl.scrollTop = editorScroll.scrollTop;
+}
+
+// ── HIGHLIGHT BACKGROUND LAYER ────────────────────────────────────────────────
+function renderHlLayer() {
+  if (!S.hlLines.length) { hlLayer.innerHTML = ''; return; }
+  const totalLines = codeEl.value.split('\n').length;
+  const totalH = PAD_TOP + totalLines * LINE_H + PAD_TOP;
+  hlLayer.style.height = totalH + 'px';
+  hlLayer.innerHTML = S.hlLines.map(n =>
+    `<div style="position:absolute;left:0;right:0;top:${PAD_TOP+(n-1)*LINE_H}px;height:${LINE_H}px;background:rgba(128,145,75,0.10);border-left:3px solid #80914b;"></div>`
+  ).join('');
+}
+
+function setHighlight(lines) {
+  S.hlLines = lines || [];
+  renderLineNums();
+  renderHlLayer();
+  if (lines.length) {
+    scrollToLine(lines[0]);
+    statusLineWrap.style.display = 'flex';
+    statusLineEl.textContent = lines[0];
+  } else {
+    statusLineWrap.style.display = 'none';
+  }
+}
+
+function scrollToLine(n) {
+  const target = PAD_TOP + (n - 3) * LINE_H;
+  editorScroll.scrollTop = Math.max(0, target);
+}
+
+editorScroll.addEventListener('scroll', () => {
+  lineNumsEl.scrollTop = editorScroll.scrollTop;
+});
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    S.codes[S.lang] = codeEl.value;
+    S.lang = tab.dataset.lang;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    codeEl.value = S.codes[S.lang];
+    setHighlight([]);
+    if (S.lastSel) setTimeout(() => applyInspect(S.lastSel), 10);
+    else renderLineNums();
+  });
+});
+
+codeEl.addEventListener('input', () => {
+  S.codes[S.lang] = codeEl.value;
+  S.lastSel = null;
+  setHighlight([]);
+});
+
+codeEl.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = codeEl.selectionStart;
+    codeEl.value = codeEl.value.slice(0, s) + '  ' + codeEl.value.slice(codeEl.selectionEnd);
+    codeEl.selectionStart = codeEl.selectionEnd = s + 2;
+    S.codes[S.lang] = codeEl.value;
+    renderLineNums();
+  }
+});
+
+// ── BUILD + RUN ───────────────────────────────────────────────────────────────
+const BRIDGE = `<script>
+(function(){
+  var ov=null;
+  function getPath(el){
+    var p=[],cur=el;
+    while(cur&&cur.tagName&&cur!==document.body){
+      var s=cur.tagName.toLowerCase();
+      if(cur.id)s+='#'+cur.id;
+      else if(cur.className&&typeof cur.className==='string'&&cur.className.trim())
+        s+='.'+cur.className.trim().split(/\\s+/).join('.');
+      p.unshift(s);cur=cur.parentElement;
+    }
+    return p.join(' > ');
+  }
+  function box(el){
+    if(ov)ov.remove();
+    var r=el.getBoundingClientRect();
+    ov=document.createElement('div');
+    Object.assign(ov.style,{
+      position:'fixed',top:r.top+'px',left:r.left+'px',
+      width:r.width+'px',height:r.height+'px',
+      border:'2px solid #80914b',background:'rgba(128,145,75,0.12)',
+      pointerEvents:'none',zIndex:'999999',borderRadius:'3px',boxSizing:'border-box'
+    });
+    document.body.appendChild(ov);
+  }
+  function clear(){if(ov){ov.remove();ov=null;}}
+  function send(type,el){
+    window.parent.postMessage({
+      type:'dl:'+type,
+      tag:el?el.tagName.toLowerCase():null,
+      id:el?(el.id||null):null,
+      cls:el?Array.from(el.classList):[],
+      path:el?getPath(el):null,
+      outerHTML:el?el.outerHTML.slice(0,600):null,
+      textContent:el?el.textContent.trim().slice(0,120):null
+    },'*');
+  }
+  document.addEventListener('mouseover',function(e){
+    if(!window.__dl)return;
+    e.stopPropagation();box(e.target);send('hover',e.target);
+  },true);
+  document.addEventListener('click',function(e){
+    if(!window.__dl)return;
+    e.preventDefault();e.stopPropagation();
+    box(e.target);send('select',e.target);
+  },true);
+  document.addEventListener('mouseleave',function(){
+    if(!window.__dl)return;clear();send('leave',null);
+  });
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='dl:set'){
+      window.__dl=e.data.on;
+      document.body.style.cursor=e.data.on?'crosshair':'';
+      if(!e.data.on)clear();
+    }
+  });
+})();
+<\/script>`;
+
+function buildDoc() {
+  const { html, css, js } = S.codes;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>${css}</style>${BRIDGE}</head>
+<body>${html}
+<script>try{${js}}catch(e){console.error(e)}<\/script>
+</body></html>`;
+}
+
+function run() {
+  frame.srcdoc = buildDoc();
+  frame.onload = () => {
+    frame.contentWindow.postMessage({ type: 'dl:set', on: S.inspect }, '*');
+  };
+}
+
+btnRun.addEventListener('click', run);
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+});
+
+// ── INSPECT TOGGLE ────────────────────────────────────────────────────────────
+btnInspect.addEventListener('click', () => {
+  S.inspect = !S.inspect;
+  btnInspect.classList.toggle('on', S.inspect);
+  statusDot.classList.toggle('active', S.inspect);
+  frame.contentWindow?.postMessage({ type: 'dl:set', on: S.inspect }, '*');
+  if (!S.inspect) {
+    tt.style.display = 'none';
+    statusInfo.textContent = 'Ative o inspetor e clique em um elemento';
+    setHighlight([]);
+    S.lastSel = null;
+  } else {
+    statusInfo.textContent = 'Clique em qualquer elemento no preview';
+  }
+});
+
+// ── IFRAME MESSAGES ───────────────────────────────────────────────────────────
+window.addEventListener('message', e => {
+  const d = e.data;
+  if (!d || typeof d.type !== 'string' || !d.type.startsWith('dl:')) return;
+
+  if (d.type === 'dl:hover' && d.tag) {
+    let h = `<span class="t">&lt;${d.tag}</span>`;
+    if (d.id) h += ` <span class="i">#${d.id}</span>`;
+    if (d.cls?.length) h += ` <span class="c">.${d.cls.join('.')}</span>`;
+    h += `<span class="t">&gt;</span>`;
+    if (d.path) h += `<span class="p">${d.path}</span>`;
+    tt.innerHTML = h;
+    tt.style.display = 'block';
+  }
+  if (d.type === 'dl:leave') tt.style.display = 'none';
+  if (d.type === 'dl:select' && d.tag) {
+    tt.style.display = 'none';
+    S.lastSel = d;
+    applyInspect(d);
+    let info = `&lt;${d.tag}`;
+    if (d.id) info += `#${d.id}`;
+    if (d.cls?.length) info += `.${d.cls.join('.')}`;
+    info += `&gt;`;
+    statusInfo.innerHTML = `<b style="color:var(--accent)">${info}</b> encontrado`;
+  }
+});
+
+document.addEventListener('mousemove', e => {
+  if (tt.style.display !== 'block') return;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + 300 > window.innerWidth)  x = e.clientX - 300 - 8;
+  if (y + 80  > window.innerHeight) y = e.clientY - 80;
+  tt.style.left = x + 'px'; tt.style.top = y + 'px';
+});
+
+// ── FIND CODE ─────────────────────────────────────────────────────────────────
+function applyInspect(d) {
+  const { tag, id, cls } = d;
+  let lines = [];
+  if      (S.lang === 'html') lines = findHTML(S.codes.html, tag, id, cls);
+  else if (S.lang === 'css')  lines = findCSS(S.codes.css, tag, id, cls);
+  else if (S.lang === 'js')   lines = findJS(S.codes.js, tag, id, cls);
+  setHighlight(lines);
+}
+
+function findHTML(code, tag, id, cls) {
+  const lines = code.split('\n');
+  const found = [];
+  function addBlock(i) {
+    found.push(i + 1);
+    if (!lines[i].includes('>')) {
+      for (let j = i+1; j < Math.min(i+6, lines.length); j++) {
+        found.push(j+1);
+        if (lines[j].includes('>')) break;
+      }
+    }
+  }
+  if (id) {
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].toLowerCase().includes('<'+tag) &&
+         (lines[i].includes(`id="${id}"`) || lines[i].includes(`id='${id}'`)))
+        addBlock(i);
+    }
+  }
+  if (!found.length && cls?.length) {
+    for (let i = 0; i < lines.length; i++) {
+      if (!lines[i].toLowerCase().includes('<'+tag)) continue;
+      if (cls.some(c => c && lines[i].includes(c))) addBlock(i);
+    }
+  }
+  if (!found.length) {
+    for (let i = 0; i < lines.length; i++) {
+      const t = lines[i].toLowerCase().trimStart();
+      if (t.startsWith('<'+tag+' ') || t.startsWith('<'+tag+'>') || t.startsWith('<'+tag+'\n')) {
+        addBlock(i); break;
+      }
+    }
+  }
+  return [...new Set(found)].sort((a,b)=>a-b).slice(0,30);
+}
+
+function findCSS(code, tag, id, cls) {
+  const lines = code.split('\n');
+  const found = [];
+  const terms = [];
+  if (id) terms.push('#'+id);
+  if (cls?.length) cls.forEach(c => c && terms.push('.'+c));
+  terms.push(tag);
+  for (let i = 0; i < lines.length; i++) {
+    if (!terms.some(t => lines[i].includes(t))) continue;
+    const onThisLine = lines[i].includes('{');
+    const onNextLine = i+1 < lines.length && lines[i+1].trim() === '{';
+    if (!onThisLine && !onNextLine && !lines[i].trim().endsWith(',')) continue;
+    let depth = 0, j = i;
+    while (j < lines.length && j < i + 50) {
+      found.push(j + 1);
+      depth += (lines[j].match(/\{/g)||[]).length;
+      depth -= (lines[j].match(/\}/g)||[]).length;
+      if (depth <= 0 && j > i) break;
+      j++;
+    }
+  }
+  return [...new Set(found)].sort((a,b)=>a-b).slice(0,50);
+}
+
+function findJS(code, tag, id, cls) {
+  const lines = code.split('\n');
+  const found = [];
+  const terms = [];
+  if (id) {
+    terms.push(`#${id}`, `getElementById('${id}')`, `getElementById("${id}")`);
+  }
+  if (cls?.length) {
+    cls.forEach(c => {
+      if (!c) return;
+      terms.push(`.${c}`, `'${c}'`, `"${c}"`);
+    });
+  }
+  terms.push(`'${tag}'`, `"${tag}"`, `<${tag}`, `${tag}(`);
+  for (let i = 0; i < lines.length; i++) {
+    if (!terms.some(t => lines[i].includes(t))) continue;
+    found.push(i + 1);
+    const opens  = (lines[i].match(/\{/g)||[]).length;
+    const closes = (lines[i].match(/\}/g)||[]).length;
+    if (opens > closes) {
+      let depth = opens - closes;
+      for (let j = i+1; j < lines.length && depth > 0 && j < i+25; j++) {
+        found.push(j+1);
+        depth += (lines[j].match(/\{/g)||[]).length;
+        depth -= (lines[j].match(/\}/g)||[]).length;
+      }
+    }
+  }
+  return [...new Set(found)].sort((a,b)=>a-b).slice(0,40);
+}
+
+// ── DIVIDER DRAG ──────────────────────────────────────────────────────────────
+let dragging = false;
+divider.addEventListener('mousedown', () => {
+  dragging = true;
+  divider.classList.add('drag');
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+  frame.style.pointerEvents = 'none';
+});
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const wr = workspace.getBoundingClientRect();
+  const pct = Math.min(75, Math.max(25, (e.clientX - wr.left) / wr.width * 100));
+  editorPanel.style.width = pct + '%';
+});
+document.addEventListener('mouseup', () => {
+  if (!dragging) return;
+  dragging = false;
+  divider.classList.remove('drag');
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+  frame.style.pointerEvents = '';
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+codeEl.value = S.codes[S.lang];
+renderLineNums();
+run();
+</script>
+</body>
+</html>
